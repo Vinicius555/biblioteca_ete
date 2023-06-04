@@ -1,4 +1,4 @@
-import sqlite3
+"""import sqlite3
 from datetime import datetime
 
 # Conectando ao banco de dados SQLite
@@ -27,4 +27,11 @@ cursor.execute(
 conn.commit()
 
 # Fechando a conexão com o banco de dados
-conn.close()
+conn.close()"""
+
+
+print("=-" * ((len("Funcionário cadastrado com sucesso!"))))
+frase = "Funcionário cadastrado com sucesso!"
+espacos = (80 - len(frase)) // 2
+print(" " * espacos + frase)
+print("=-" * ((len("Funcionário cadastrado com sucesso!"))))

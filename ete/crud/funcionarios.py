@@ -69,49 +69,77 @@ class CrudFuncionario:
                 f"INSERT INTO funcionarios VALUES (NULL, '{nome}', '{cpf}', '{email}', '{fone}', '{uf}')"
             )
             conexao.banco.commit()
-            print("Funcionário cadastrado com sucesso!")
+            print("=-" * len("Funcionário cadastrado com sucesso!"))
+            frase = "Funcionário cadastrado com sucesso!"
+            print("=-" * len("Funcionário cadastrado com sucesso!"))
 
     @staticmethod
-    def ler_funcionario(self):
+    def ler_funcionarios():
         try:
-            while True:
-                print("1. Verificar Funcionários")
-                print("2. Pesquisar Funcionário")
-                print("3. Sair")
-                perg = int(input("Selecione a opção: "))
+            conexao.cursor.execute("SELECT * FROM funcionarios")
+            funcionarios = conexao.cursor.fetchall()
 
-                if perg == 1:
-                    conexao.cursor.execute("SELECT * FROM funcionarios")
-                    read = conexao.cursor.fetchall()
-                    return read
-                elif perg == 2:
-                    self.id = id_pesquisa
-                    id_pesquisa = input("ID: ")
-                    conexao.cursor.execute(
-                        f"SELECT * FROM funcionarios WHERE id = {id_pesquisa}"
-                    )
-                    read = conexao.cursor.fetchall()
-                    return read
-                else:
-                    break
+            for funcionario in funcionarios:
+                print("ID:", funcionario[0])
+                print("Nome:", funcionario[1])
+                print("CPF:", funcionario[2])
+                print("Email:", funcionario[3])
+                print("Fone:", funcionario[4])
+                print("UF:", funcionario[5])
+                print("========================")
+
+        except conexao.error as ex:
+            print(ex)
+
+    @staticmethod
+    def ler_funcionario(id):
+        try:
+            id = int(id)
+            conexao.cursor.execute(f"SELECT * FROM funcionarios WHERE id={id}")
+            ler = conexao.cursor.fetchall()
+            return ler
+        except ValueError:
+            print("Erro: ID inválido.")
         except conexao.error as ex:
             print(ex)
 
     def crud_execute(self):
         while True:
-            perg = int(input("Selecione a opção:"))
-            print("1. Cadastra Funcionario.")
-            print("2. Lista Funciionario.")
-            print("3. sair")
+            print("1. Cadastrar Funcionário.")
+            print("2. Listar Funcionários.")
+            print("3. Lista Um Funcionário.")
+            print("4. Sair")
+            perg = input("Selecione a opção:")
 
-            if perg == 1:
-                self.criar_Funcionario
-            if perg == 2:
-                self.ler_funcionario
-            elif perg == 3:
+            if perg == "1":
+                self.criar_Funcionario()
+            elif perg == "2":
+                print("Esse são os funcionarios Cadastrados no Sitema.")
+                self.ler_funcionarios()
+            elif perg == "3":
+                id = input("Digite o ID do funcionário:")
+                funcionario = self.ler_funcionario(id)
+                if funcionario:
+                    funcionario = funcionario[0]
+                    print("==" * len("Funcionário não encontrado."))
+                    print("Dados do funcionário:")
+                    print("ID:", funcionario[0])
+                    print("Nome:", funcionario[1])
+                    print("CPF:", funcionario[2])
+                    print("Email:", funcionario[3])
+                    print("Fone:", funcionario[4])
+                    print("UF:", funcionario[5])
+                    print("==" * len("Funcionário não encontrado."))
+                else:
+                    print("==" * len("Funcionário não encontrado."))
+                    print("Funcionário não encontrado.")
+                    print("==" * len("Funcionário não encontrado."))
+            elif perg == "4":
                 break
-            else:
+            elif not perg.isdigit() or int(perg) > 3 or int(perg) < 0:
                 print("Opção Inválida")
+                print("=-" * len("Selecione a opção"))
 
 
-CrudFuncionario.crud_execute()
+crud = CrudFuncionario()
+crud.crud_execute()
