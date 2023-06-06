@@ -1,4 +1,4 @@
-import crud.conexao as conexao
+import conexao
 import re
 from livros import CrudLivros
 from unidecode import unidecode
