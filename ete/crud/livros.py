@@ -200,9 +200,7 @@ class CrudLivros:
                         print("CATEGORIA:", livro[4])
                         print("======================")
                         break
-                    perg = str(
-                        input(f"Deseja Deletar o cadastro do cliente (S/N):")
-                    ).lower()
+                    perg = str(input(f"Deseja Deletar o livro (S/N):")).lower()
                     if perg == "s":
                         conexao.cursor.execute(f"DELETE FROM livros WHERE id={id}")
                         conexao.banco.commit()
