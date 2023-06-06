@@ -1,4 +1,6 @@
 import conexao
+import re
+from livros import CrudLivros
 
 
 class Clientes:
@@ -22,7 +24,7 @@ class CrudClientes:
                 cpf = input("CPF:")
                 if not cpf.isdigit():
                     print("ERROR!Digite apenas números.")
-                elif cpf != 11:
+                elif len(cpf) != 11:
                     print("ERROR!Tamanaho do CPF inválido.")
                 else:
                     break
@@ -30,7 +32,7 @@ class CrudClientes:
                 fone = input("FONE:")
                 if not fone.isdigit():
                     print("ERROR!Digite apenas Números.")
-                elif fone != 11:
+                elif len(fone) != 11:
                     print("ERROR!Esse número não existi.")
                 else:
                     break
@@ -40,6 +42,9 @@ class CrudClientes:
             conexao.cursor.execute(
                 f"INSERT INTO clientes VALUES (NULL,'{nome}',{cpf},{fone})"
             )
+            conexao.banco.commit()
+            print("Usuário cadastrado com sucesso!")
+            print("==" * len("Usuário cadastrado com sucesso!"))
 
     @staticmethod
     def ler_clientes():
@@ -58,22 +63,51 @@ class CrudClientes:
         except conexao.error as ex:
             print(ex)
 
-    def ler_cliente(self, id):
+    @staticmethod
+    def ler_cliente():
         try:
-            id = int(id)
-            conexao.cursor.execute(f"SELECT * FROM clientes WHERE id={id}")
-            cliente = conexao.cursor.fetchall()
-
-            return cliente
-
+            while True:
+                nome = input("Informe o Nome:")
+                conexao.cursor.execute(f"SELECT * FROM clientes WHERE Nome='{nome}'")
+                cliente = conexao.cursor.fetchall()
+                if cliente:
+                    for cliente in cliente:
+                        print("======================")
+                        print("ID:", cliente[0])
+                        print("NOME:", cliente[1])
+                        print("CPF:", cliente[2])
+                        print("FONE:", cliente[3])
+                        print("======================")
+                    break
+                else:
+                    print("cliente não encontrado!")
+                    print("1. Ler clientes Cadastrados")
+                    print("2. Procurar cliente.")
+                    print("3. sair")
+                    perg = input("Oque Deseja Fazer:")
+                    if perg == "1":
+                        CrudClientes().ler_clientes()
+                    elif perg == "2":
+                        pass
+                    elif perg == "3":
+                        break
+                    else:
+                        print("Opção Inválida.")
         except conexao.error as ex:
             print(ex)
 
     @staticmethod
-    def atualizar_cliente(id):
+    def atualizar_cliente():
         try:
-            id = int(input("Informe o ID:"))
-            cliente = conexao.cursor.execute(f"SELECT * FROM clientes WHERE id={id}")
+            while True:
+                nome = str(input("Informe o Nome:"))
+                cliente = conexao.cursor.execute(
+                    f"SELECT * FROM clientes WHERE Nome='{nome}'"
+                ).fetchone()
+                if cliente:
+                    break
+                else:
+                    print("Usuário não encontrado.")
 
             if cliente:
                 print("======================")
@@ -96,18 +130,24 @@ class CrudClientes:
                     novo_fone = novo_fone if novo_fone else cliente[3]
 
                     if not novo_nome.isalpha():
+                        if novo_nome.strip():
+                            pass
                         print("ERROR!O nome deve conter apenas letras.")
                     elif not novo_cpf.isdigit():
+                        if novo_cpf.strip():
+                            pass
                         print("ERROR!O CPF deve conter apenas Números.")
-                    elif novo_cpf != 11:
+                    elif len(novo_cpf) != 11:
                         print("ERROR!CPF Inválido.")
                     elif not novo_fone.isdigit():
+                        if novo_fone.strip():
+                            pass
                         print("ERROR!O Telefone deve conter apenas númereos.")
-                    elif novo_fone != 11:
+                    elif len(novo_fone) != 11:
                         print("ERROR!Telefone inválido.")
                     else:
                         conexao.cursor.execute(
-                            f"UPDDATE clientes SET Nome='{novo_nome}' , CPF={novo_cpf},Fone={novo_fone} WHERE id={id}"
+                            f"UPDATE clientes SET Nome='{novo_nome}' , CPF={novo_cpf},Fone={novo_fone} WHERE Nome='{nome}'"
                         )
                         conexao.banco.commit()
                         print("Cliente Atualizado com sucesso!")
@@ -117,27 +157,68 @@ class CrudClientes:
         except ValueError:
             print("Erro: ID Inválido.")
 
-    def deleta_cliente(self, id):
+    @staticmethod
+    def deleta_cliente():
         try:
-            id = int(input("Informe o ID:"))
-            cliente = self.ler_cliente(id)
+            while True:
+                id = input("Informe o ID:")
+                conexao.cursor.execute(f"SELECT * FROM clientes WHERE id={id}")
+                cliente = conexao.cursor.fetchall()
 
-            if cliente and len(cliente) > 0:
-                print("======================")
-                print("ID:", cliente[0])
-                print("NOME:", cliente[1])
-                print("CPF:", cliente[2])
-                print("FONE:", cliente[3])
-                print("======================")
-            else:
-                print("Cliente não encontrado")
-            perg = str(input(f"Deseja Deletar o cadastro do cliente (S/N):")).lower()
-            if perg == "s":
-                conexao.cursor.execute(f"DELETE FROM clientes WHERE id={id}")
-                conexao.banco.commit()
-                print("Cliente Deletado com Sucesso.")
-            else:
-                pass
+                if cliente:
+                    for cliente in cliente:
+                        print("======================")
+                        print("ID:", cliente[0])
+                        print("NOME:", cliente[1])
+                        print("CPF:", cliente[2])
+                        print("FONE:", cliente[3])
+                        print("======================")
+                        break
+                    perg = str(
+                        input(f"Deseja Deletar o cadastro do cliente (S/N):")
+                    ).lower()
+                    if perg == "s":
+                        conexao.cursor.execute(f"DELETE FROM clientes WHERE id={id}")
+                        conexao.banco.commit()
+                        print("Cliente Deletado com Sucesso.")
+                    break
+                else:
+                    print("Cliente não encontrado")
+                    print("Oque deseja fazer:")
+                    print("1. Tentar De novo.")
+                    print("2. Lista Clientes.")
+                    print("3. Sair")
+                    perg = input("Selecione a opção.")
+                    if perg == "1":
+                        pass
+                    elif perg == "2":
+                        CrudClientes().ler_clientes()
+                    elif perg == "3":
+                        print("============================")
+                        break
+                    else:
+                        print("Opção inválida.")
 
         except ValueError:
             print("Erro: ID inválido.")
+
+    def crud_execute_usuario(self):
+        while True:
+            print("1. Cadastrar Novo Cliente.")
+            print("2. Alterar Dados do CLiente.")
+            print("3. Lista Livros")
+            print("4. Pesquisar Livro")
+            print("5. Sair")
+            perg = input("Selecione a opção:")
+            print("==" * len("Cadastrar Novo Cliente."))
+
+            if perg == "1":
+                self.criar_clientes()
+            elif perg == "2":
+                self.atualizar_cliente()
+            elif perg == "3":
+                CrudLivros().ler_livros()
+            elif perg == "4":
+                CrudLivros().ler_livro()
+            elif perg == "5":
+                break

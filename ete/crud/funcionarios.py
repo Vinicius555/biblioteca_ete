@@ -1,5 +1,8 @@
 import conexao
 import re
+from clientes import CrudClientes
+from livros import CrudLivros
+
 
 validar_email = r"^[\w\.-]+@[\w]+\.[a-zA-Z]{2,}$"
 
@@ -70,7 +73,7 @@ class CrudFuncionario:
             )
             conexao.banco.commit()
             print("=-" * len("Funcionário cadastrado com sucesso!"))
-            frase = "Funcionário cadastrado com sucesso!"
+            print("Funcionário cadastrado com sucesso!")
             print("=-" * len("Funcionário cadastrado com sucesso!"))
 
     @staticmethod
@@ -91,109 +94,178 @@ class CrudFuncionario:
         except conexao.error as ex:
             print(ex)
 
-    def ler_funcionario(self, id):
+    @staticmethod
+    def ler_funcionario():
         try:
-            id = int(id)
-            conexao.cursor.execute(f"SELECT * FROM funcionarios WHERE id={id}")
-            funcionarios = conexao.cursor.fetchall()
-
-            return funcionarios
+            while True:
+                nome = input("Informe o Nome:")
+                conexao.cursor.execute(
+                    f"SELECT * FROM funcionarios WHERE Nome='{nome}'"
+                )
+                funcionarios = conexao.cursor.fetchall()
+                if funcionarios:
+                    for funcionario in funcionarios:
+                        print("Dados atuais do funcionário:")
+                        print("ID:", funcionario[0])
+                        print("Nome:", funcionario[1])
+                        print("CPF:", funcionario[2])
+                        print("Email:", funcionario[3])
+                        print("Fone:", funcionario[4])
+                        print("UF:", funcionario[5])
+                        print("========================")
+                    break
+                else:
+                    print("Funcionario não encontrado!")
+                    print("1. Ler Funcionarios Cadastrados")
+                    print("2. Procurar Funcionario.")
+                    print("3. sair")
+                    perg = input("Oque Deseja Fazer:")
+                    if perg == "1":
+                        CrudFuncionario().ler_funcionarios()
+                    elif perg == "2":
+                        pass
+                    elif perg == "3":
+                        break
+                    else:
+                        print("Opção Inválida.")
 
         except conexao.error as ex:
             print(ex)
 
     @staticmethod
-    def atualizar_funcionario(id):
+    def atualizar_funcionario():
         try:
-            id = int(input("Informe o ID:"))
-            conexao.cursor.execute(f"SELECT * FROM funcionarios WHERE id={id}")
-            funcionario = conexao.cursor.fetchone()
-
-            if funcionario:
-                print("Dados atuais do funcionário:")
-                print("ID:", funcionario[0])
-                print("Nome:", funcionario[1])
-                print("CPF:", funcionario[2])
-                print("Email:", funcionario[3])
-                print("Fone:", funcionario[4])
-                print("UF:", funcionario[5])
-                print("========================")
-
-                while True:
-                    print(
-                        "Digite os novos dados do funcionário (ou deixe em branco para manter o valor atual):"
-                    )
-                    novo_nome = input(f"Novo nome ({funcionario[1]}): ")
-                    novo_cpf = input(f"Novo CPF ({funcionario[2]}): ")
-                    novo_email = input(f"Novo email ({funcionario[3]}): ")
-                    novo_fone = input(f"Novo telefone ({funcionario[4]}): ")
-                    nova_uf = input(f"Nova UF ({funcionario[5]}): ")
-
-                    novo_nome = novo_nome if novo_nome else funcionario[1]
-                    novo_cpf = novo_cpf if novo_cpf else funcionario[2]
-                    novo_email = novo_email if novo_email else funcionario[3]
-                    novo_fone = novo_fone if novo_fone else funcionario[4]
-                    nova_uf = nova_uf if nova_uf else funcionario[5]
-
-                    if not novo_nome.isalpha():
-                        print("Erro: O nome deve conter apenas letras.")
-                    elif not novo_cpf.isdigit() or len(novo_cpf) != 11:
-                        print("Erro: CPF inválido.")
-                    elif not re.match(validar_email, novo_email):
-                        print("Erro: Email inválido.")
-                    elif not novo_fone.isdigit() or len(novo_fone) != 11:
-                        print("Erro: Número de telefone inválido.")
-                    elif not nova_uf.isalpha() or len(nova_uf) != 2:
-                        print("Erro: UF inválida.")
+            while True:
+                nome = input("Informe o Nome:")
+                conexao.cursor.execute(
+                    f"SELECT * FROM funcionarios WHERE Nome='{nome}'"
+                )
+                funcionarios = conexao.cursor.fetchall()
+                if funcionarios:
+                    for funcionario in funcionarios:
+                        print("Dados atuais do funcionário:")
+                        print("ID:", funcionario[0])
+                        print("Nome:", funcionario[1])
+                        print("CPF:", funcionario[2])
+                        print("Email:", funcionario[3])
+                        print("Fone:", funcionario[4])
+                        print("UF:", funcionario[5])
+                        print("========================")
+                    break
+                else:
+                    print("Funcionário não encontrado.")
+                    print("1. Pesquisar de novo.")
+                    print("2. Verificar funcionários registrados.")
+                    print("3. Sair")
+                    perg = input("O que deseja fazer:")
+                    if perg == "1":
+                        pass
+                    elif perg == "2":
+                        CrudFuncionario().ler_funcionarios()
+                    elif perg == "3":
+                        break
                     else:
+                        print("Opção inválida.")
+
+            while True:
+                print(
+                    "Digite os novos dados do funcionário (ou deixe em branco para manter o valor atual):"
+                )
+                novo_nome = input(f"Novo nome ({funcionario[1]}): ")
+                novo_cpf = input(f"Novo CPF ({funcionario[2]}): ")
+                novo_email = input(f"Novo email ({funcionario[3]}): ")
+                novo_fone = input(f"Novo telefone ({funcionario[4]}): ")
+                nova_uf = input(f"Nova UF ({funcionario[5]}): ")
+
+                novo_nome = novo_nome if novo_nome else funcionario[1]
+                novo_cpf = novo_cpf if novo_cpf else funcionario[2]
+                novo_email = novo_email if novo_email else funcionario[3]
+                novo_fone = novo_fone if novo_fone else funcionario[4]
+                nova_uf = nova_uf if nova_uf else funcionario[5]
+
+                if not novo_nome.isalpha():
+                    print("Erro: O nome deve conter apenas letras.")
+                elif not novo_cpf.isdigit() or len(novo_cpf) != 11:
+                    print("Erro: CPF inválido.")
+                elif not re.match(validar_email, novo_email):
+                    print("Erro: Email inválido.")
+                elif not novo_fone.isdigit() or len(novo_fone) != 11:
+                    print("Erro: Número de telefone inválido.")
+                elif not nova_uf.isalpha() or len(nova_uf) != 2:
+                    print("Erro: UF inválida.")
+                else:
+                    conexao.cursor.execute(
+                        f"UPDATE funcionarios SET nome='{novo_nome}', cpf='{novo_cpf}', email='{novo_email}', fone='{novo_fone}', uf='{nova_uf}' WHERE id={funcionario[0]}"
+                    )
+                    conexao.banco.commit()
+                    print("Funcionário atualizado com sucesso!")
+                    break
+        except ValueError:
+            print("Erro: Nome não encontrado inválido.")
+
+    @staticmethod
+    def deletar_funcionario():
+        try:
+            while True:
+                id = int(input("Informe o ID:"))
+                conexao.cursor.execute(f"SELECT * FROM funcionarios WHERE id={id}")
+                funcionario = conexao.cursor.fetchall()
+
+                if funcionario:
+                    for funcionario in funcionario:
+                        print("Dados do funcionário:")
+                        print("ID:", funcionario[0])
+                        print("Nome:", funcionario[1])
+                        print("CPF:", funcionario[2])
+                        print("Email:", funcionario[3])
+                        print("Fone:", funcionario[4])
+                        print("UF:", funcionario[5])
+                        print("========================")
+                        break
+                    perg = str(
+                        input(f"Deseja Deletar o cadastro do funcionario (S/N):")
+                    ).lower()
+                    if perg == "s":
                         conexao.cursor.execute(
-                            f"UPDATE funcionarios SET nome='{novo_nome}', cpf='{novo_cpf}', email='{novo_email}', fone='{novo_fone}', uf='{nova_uf}' WHERE id={id}"
+                            f"DELETE FROM funcionarios WHERE id={id}"
                         )
                         conexao.banco.commit()
-                        print("Funcionário atualizado com sucesso!")
+                        print("Funcionario Deletado com Sucesso.")
                         break
-
-            else:
-                print("Funcionário não encontrado.")
-
+                else:
+                    print("Funcionário não encontrado.")
+                    print("Oque deseja fazer:")
+                    print("1. Tentar De novo.")
+                    print("2. Lista Funcionarios.")
+                    print("3. Sair")
+                    perg = input("Selecione a opção.")
+                    if perg == "1":
+                        pass
+                    elif perg == "2":
+                        CrudFuncionario().ler_funcionarios()
+                    elif perg == "3":
+                        print("============================")
+                        break
+                    else:
+                        print("Opção inválida.")
         except ValueError:
             print("Erro: ID inválido.")
 
-    def deletar_funcionario(self):
-        try:
-            id = int(input("Informe o ID:"))
-            funcionario = self.ler_funcionario(id)
-
-            if funcionario and len(funcionario) > 0:
-                print("Dados do funcionário:")
-                print("ID:", funcionario[0])
-                print("Nome:", funcionario[1])
-                print("CPF:", funcionario[2])
-                print("Email:", funcionario[3])
-                print("Fone:", funcionario[4])
-                print("UF:", funcionario[5])
-                print("========================")
-            else:
-                print("Funcionário não encontrado.")
-            perg = str(
-                input(f"Deseja Deletar o cadastro do funcionario (S/N):")
-            ).lower()
-            if perg == "s":
-                conexao.cursor.execute(f"DELETE FROM funcionarios WHERE id={id}")
-                conexao.banco.commit()
-                print("Funcionario Deletado com Sucesso.")
-            else:
-                pass
-
-        except ValueError:
-            print("Erro: ID inválido.")
-
-    def crud_execute(self):
+    def crud_execute_funcionario(self):
         while True:
-            print("1. Cadastrar Funcionário.")
-            print("2. Listar Funcionários.")
-            print("3. Lista Um Funcionário.")
-            print("4. Sair")
+            print("1.  Cadastrar Funcionário.")
+            print("2.  Listar Funcionários.")
+            print("3.  Procurar Funcionário.")
+            print("4.  Alterar Funcionário.")
+            print("5.  Deleta Funcionário")
+            print("6.  Lista Cliente.")
+            print("7.  Procurar Cliente.")
+            print("8.  Deleta Cliente.")
+            print("9.  Cadastrar Livro.")
+            print("10. Alterar livro.")
+            print("11. Lista Livros.")
+            print("12. Procurar Livro.")
+            print("0.  Sair")
             perg = input("Selecione a opção:")
             print("==" * len("Cadastrar Funcionário."))
 
@@ -203,29 +275,28 @@ class CrudFuncionario:
                 print("Esse são os funcionarios Cadastrados no Sistema.")
                 self.ler_funcionarios()
             elif perg == "3":
-                id = input("Digite o ID do funcionário:")
-                funcionarios = self.ler_funcionario(id)
-                if funcionarios:
-                    funcionario = funcionarios[0]
-                    print("==" * len("Funcionário não encontrado."))
-                    print("Dados do funcionário:")
-                    print("ID:", funcionario[0])
-                    print("Nome:", funcionario[1])
-                    print("CPF:", funcionario[2])
-                    print("Email:", funcionario[3])
-                    print("Fone:", funcionario[4])
-                    print("UF:", funcionario[5])
-                    print("==" * len("Funcionário não encontrado."))
-                else:
-                    print("==" * len("Funcionário não encontrado."))
-                    print("Funcionário não encontrado.")
-                    print("==" * len("Funcionário não encontrado."))
+                CrudFuncionario().ler_funcionario()
             elif perg == "4":
-                break
-            elif not perg.isdigit() or int(perg) > 3 or int(perg) < 0:
+                CrudFuncionario().atualizar_funcionario()
+            elif perg == "5":
+                CrudFuncionario.deletar_funcionario()
+            elif perg == "6":
+                CrudClientes().ler_clientes()
+            elif perg == "7":
+                CrudClientes().ler_cliente()
+            elif perg == "8":
+                CrudClientes().deleta_cliente()
+            elif perg == "9":
+                CrudLivros.criar_livros()
+            elif perg == "10":
+                CrudLivros().atualizar_livro()
+            elif perg == "11":
+                CrudLivros.deleta_livro()
+            elif not perg.isdigit() or int(perg) > 11 or int(perg) < 0:
                 print("Opção Inválida")
                 print("=-" * len("Selecione a opção"))
+            else:
+                break
 
 
-crud = CrudFuncionario()
-crud.crud_execute()
+CrudFuncionario().crud_execute_funcionario()
