@@ -2,7 +2,9 @@ import conexao
 import re
 from clientes import CrudClientes
 from livros import CrudLivros
+from unidecode import unidecode
 
+nome_padrao = r"^[a-zA-Z]+( [a-zA-Z]+)*$"
 
 validar_email = r"^[\w\.-]+@[\w]+\.[a-zA-Z]{2,}$"
 
@@ -21,11 +23,14 @@ class CrudFuncionario:
     def criar_Funcionario():
         try:
             while True:
-                nome = input("Nome: ")
-                if not nome.isalpha():
-                    print("Erro: O nome deve conter apenas letras.")
-                else:
-                    break
+                nome = input("NOME:")
+                nomes = nome.split()
+
+                if len(nomes) >= 1:
+                    nome_completo = " ".join(nomes)
+                    nome_sem_acentos = unidecode(nome_completo)
+                    if re.match(nome_padrao, nome_sem_acentos):
+                        break
 
             while True:
                 cpf = input("CPF: ")
@@ -151,6 +156,8 @@ class CrudFuncionario:
                         print("Fone:", funcionario[4])
                         print("UF:", funcionario[5])
                         print("========================")
+
+                    funcionario_atual = funcionario
                     break
                 else:
                     print("Funcionário não encontrado.")
@@ -171,37 +178,38 @@ class CrudFuncionario:
                 print(
                     "Digite os novos dados do funcionário (ou deixe em branco para manter o valor atual):"
                 )
-                novo_nome = input(f"Novo nome ({funcionario[1]}): ")
-                novo_cpf = input(f"Novo CPF ({funcionario[2]}): ")
-                novo_email = input(f"Novo email ({funcionario[3]}): ")
-                novo_fone = input(f"Novo telefone ({funcionario[4]}): ")
-                nova_uf = input(f"Nova UF ({funcionario[5]}): ")
+                novo_nome = input(f"Novo nome ({funcionario_atual[1]}): ")
+                novo_cpf = input(f"Novo CPF ({funcionario_atual[2]}): ")
+                novo_email = input(f"Novo email ({funcionario_atual[3]}): ")
+                novo_fone = input(f"Novo telefone ({funcionario_atual[4]}): ")
+                nova_uf = input(f"Nova UF ({funcionario_atual[5]}): ")
 
-                novo_nome = novo_nome if novo_nome else funcionario[1]
-                novo_cpf = novo_cpf if novo_cpf else funcionario[2]
-                novo_email = novo_email if novo_email else funcionario[3]
-                novo_fone = novo_fone if novo_fone else funcionario[4]
-                nova_uf = nova_uf if nova_uf else funcionario[5]
+                novo_nome = novo_nome if novo_nome else funcionario_atual[1]
+                novo_cpf = novo_cpf if novo_cpf else funcionario_atual[2]
+                novo_email = novo_email if novo_email else funcionario_atual[3]
+                novo_fone = novo_fone if novo_fone else funcionario_atual[4]
+                nova_uf = nova_uf if nova_uf else funcionario_atual[5]
 
-                if not novo_nome.isalpha():
-                    print("Erro: O nome deve conter apenas letras.")
-                elif not novo_cpf.isdigit() or len(novo_cpf) != 11:
-                    print("Erro: CPF inválido.")
-                elif not re.match(validar_email, novo_email):
-                    print("Erro: Email inválido.")
-                elif not novo_fone.isdigit() or len(novo_fone) != 11:
-                    print("Erro: Número de telefone inválido.")
-                elif not nova_uf.isalpha() or len(nova_uf) != 2:
-                    print("Erro: UF inválida.")
+                if not novo_nome.isspace() and re.match(nome_padrao, novo_nome):
+                    if not novo_cpf.isdigit() or len(novo_cpf) != 11:
+                        print("Erro: CPF inválido.")
+                    elif not re.match(validar_email, novo_email):
+                        print("Erro: Email inválido.")
+                    elif not novo_fone.isdigit() or len(novo_fone) != 11:
+                        print("Erro: Número de telefone inválido.")
+                    elif not nova_uf.isalpha() or len(nova_uf) != 2:
+                        print("Erro: UF inválida.")
+                    else:
+                        conexao.cursor.execute(
+                            f"UPDATE funcionarios SET nome='{novo_nome}', cpf={novo_cpf}, email='{novo_email}', fone={novo_fone}, uf='{nova_uf}' WHERE Nome='{nome}'"
+                        )
+                        conexao.banco.commit()
+                        print("Funcionário atualizado com sucesso!")
+                        break
                 else:
-                    conexao.cursor.execute(
-                        f"UPDATE funcionarios SET nome='{novo_nome}', cpf='{novo_cpf}', email='{novo_email}', fone='{novo_fone}', uf='{nova_uf}' WHERE id={funcionario[0]}"
-                    )
-                    conexao.banco.commit()
-                    print("Funcionário atualizado com sucesso!")
-                    break
+                    print("Erro: Formato de nome inválido.")
         except ValueError:
-            print("Erro: Nome não encontrado inválido.")
+            print("Erro: Nome inválido.")
 
     @staticmethod
     def deletar_funcionario():
@@ -233,12 +241,14 @@ class CrudFuncionario:
                         print("Funcionario Deletado com Sucesso.")
                         break
                 else:
+                    print("============================")
                     print("Funcionário não encontrado.")
                     print("Oque deseja fazer:")
                     print("1. Tentar De novo.")
                     print("2. Lista Funcionarios.")
                     print("3. Sair")
                     perg = input("Selecione a opção.")
+                    print("============================")
                     if perg == "1":
                         pass
                     elif perg == "2":
@@ -251,8 +261,10 @@ class CrudFuncionario:
         except ValueError:
             print("Erro: ID inválido.")
 
-    def crud_execute_funcionario(self):
+    @staticmethod
+    def crud_execute_funcionario():
         while True:
+            print("==============================")
             print("1.  Cadastrar Funcionário.")
             print("2.  Listar Funcionários.")
             print("3.  Procurar Funcionário.")
@@ -265,15 +277,16 @@ class CrudFuncionario:
             print("10. Alterar livro.")
             print("11. Lista Livros.")
             print("12. Procurar Livro.")
+            print("13. Deletar Livro")
             print("0.  Sair")
             perg = input("Selecione a opção:")
-            print("==" * len("Cadastrar Funcionário."))
+            print("=============================")
 
             if perg == "1":
-                self.criar_Funcionario()
+                CrudFuncionario().criar_Funcionario()
             elif perg == "2":
                 print("Esse são os funcionarios Cadastrados no Sistema.")
-                self.ler_funcionarios()
+                CrudFuncionario().ler_funcionarios()
             elif perg == "3":
                 CrudFuncionario().ler_funcionario()
             elif perg == "4":
@@ -291,12 +304,14 @@ class CrudFuncionario:
             elif perg == "10":
                 CrudLivros().atualizar_livro()
             elif perg == "11":
+                CrudLivros().ler_livros()
+            elif perg == "12":
+                CrudLivros().ler_livro()
+            elif perg == "13":
                 CrudLivros.deleta_livro()
-            elif not perg.isdigit() or int(perg) > 11 or int(perg) < 0:
-                print("Opção Inválida")
-                print("=-" * len("Selecione a opção"))
-            else:
+            elif perg == "0":
                 break
-
-
-CrudFuncionario().crud_execute_funcionario()
+            else:
+                print("======================================================")
+                print("Opção inválida. Por favor, selecione uma opção válida.")
+                print("======================================================")

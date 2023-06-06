@@ -1,6 +1,9 @@
-import conexao
+import crud.conexao as conexao
 import re
 from livros import CrudLivros
+from unidecode import unidecode
+
+nome_padrao = r"^[a-zA-Z]+( [a-zA-Z]+)*$"
 
 
 class Clientes:
@@ -16,10 +19,13 @@ class CrudClientes:
         try:
             while True:
                 nome = input("NOME:")
-                if not nome.isalpha():
-                    print("ERROR!Digite apenas Letras")
-                else:
-                    break
+                nomes = nome.split()
+
+                if len(nomes) >= 1:
+                    nome_completo = " ".join(nomes)
+                    nome_sem_acentos = unidecode(nome_completo)
+                    if re.match(nome_padrao, nome_sem_acentos):
+                        break
             while True:
                 cpf = input("CPF:")
                 if not cpf.isdigit():
@@ -101,23 +107,16 @@ class CrudClientes:
         try:
             while True:
                 nome = str(input("Informe o Nome:"))
-                cliente = conexao.cursor.execute(
-                    f"SELECT * FROM clientes WHERE Nome='{nome}'"
-                ).fetchone()
+                conexao.cursor.execute(f"SELECT * FROM clientes WHERE Nome='{nome}'")
+                cliente = conexao.cursor.fetchone()
+
                 if cliente:
-                    break
-                else:
-                    print("Usuário não encontrado.")
-
-            if cliente:
-                print("======================")
-                print("ID:", cliente[0])
-                print("NOME:", cliente[1])
-                print("CPF:", cliente[2])
-                print("FONE:", cliente[3])
-                print("======================")
-
-                while True:
+                    print("======================")
+                    print("ID:", cliente[0])
+                    print("NOME:", cliente[1])
+                    print("CPF:", cliente[2])
+                    print("FONE:", cliente[3])
+                    print("======================")
                     print(
                         "Digite os novos DADOS de cliente (ou deixe em branco para manter o valor atual):"
                     )
@@ -129,33 +128,30 @@ class CrudClientes:
                     novo_cpf = novo_cpf if novo_cpf else cliente[2]
                     novo_fone = novo_fone if novo_fone else cliente[3]
 
-                    if not novo_nome.isalpha():
-                        if novo_nome.strip():
-                            pass
-                        print("ERROR!O nome deve conter apenas letras.")
-                    elif not novo_cpf.isdigit():
-                        if novo_cpf.strip():
-                            pass
-                        print("ERROR!O CPF deve conter apenas Números.")
-                    elif len(novo_cpf) != 11:
-                        print("ERROR!CPF Inválido.")
-                    elif not novo_fone.isdigit():
-                        if novo_fone.strip():
-                            pass
-                        print("ERROR!O Telefone deve conter apenas númereos.")
-                    elif len(novo_fone) != 11:
-                        print("ERROR!Telefone inválido.")
+                    if not novo_nome.isspace() and re.match(nome_padrao, novo_nome):
+                        if not novo_cpf.isdigit():
+                            print("ERROR! O CPF deve conter apenas números.")
+                        elif len(novo_cpf) != 11:
+                            print("ERROR! CPF Inválido.")
+                        elif not novo_fone.isdigit():
+                            print("ERROR! O Telefone deve conter apenas números.")
+                        elif len(novo_fone) != 11:
+                            print("ERROR! Telefone inválido.")
+                        else:
+                            conexao.cursor.execute(
+                                f"UPDATE clientes SET Nome='{novo_nome}', CPF='{novo_cpf}', Fone='{novo_fone}' WHERE Nome='{nome}'"
+                            )
+                            conexao.banco.commit()
+                            print("Cliente Atualizado com sucesso!")
+                            break
                     else:
-                        conexao.cursor.execute(
-                            f"UPDATE clientes SET Nome='{novo_nome}' , CPF={novo_cpf},Fone={novo_fone} WHERE Nome='{nome}'"
-                        )
-                        conexao.banco.commit()
-                        print("Cliente Atualizado com sucesso!")
-                        break
+                        print("ERROR! O nome deve conter apenas letras.")
+                else:
+                    print("Cliente não encontrado.")
         except conexao.error as ex:
-            print(ex)
+            print("Erro de conexão com o banco de dados:", ex)
         except ValueError:
-            print("Erro: ID Inválido.")
+            print("Erro: Nome inválido.")
 
     @staticmethod
     def deleta_cliente():

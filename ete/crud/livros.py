@@ -1,4 +1,4 @@
-import conexao
+import crud.conexao as conexao
 import re
 from unidecode import unidecode
 
@@ -101,6 +101,7 @@ class CrudLivros:
                         print("CATEGORIA:", livro[4])
                         print("======================")
                         break
+                    break
                 else:
                     print("Livro não encontrado!")
                     print("1. Procurar de novo:")
@@ -123,61 +124,10 @@ class CrudLivros:
     def atualizar_livro():
         try:
             id = int(input("Informe o ID:"))
-            livro = conexao.cursor.execute(f"SELECT * FROM livros WHERE id={id}")
+            conexao.cursor.execute(f"SELECT * FROM livros WHERE id={id}")
+            livro = conexao.cursor.fetchone()
 
             if livro:
-                for livro in livro:
-                    print("======================")
-                    print("ID:", livro[0])
-                    print("NOME DO LIVRO:", livro[1])
-                    print("AUTOR:", livro[2])
-                    print("ANO DE LANÇAMENTO:", livro[3])
-                    print("CATEGORIA:", livro[4])
-                    print("======================")
-                    break
-
-                while True:
-                    print(
-                        "Digite os novos DADOS de cliente (ou deixe em branco para manter o valor atual):"
-                    )
-                    novo_nome = input(f"Novo Nome ({livro[1]})")
-                    novo_autor = input(f"Novo CPF ({livro[2]})")
-                    novo_ano = input(f"Novo Telefone ({livro[3]})")
-                    novo_categoria = input(f"Nova Categoria ({livro[4]})")
-
-                    novo_nome = novo_nome if novo_nome else livro[1]
-                    novo_autor = novo_autor if novo_autor else livro[2]
-                    novo_ano = novo_ano if novo_ano else livro[3]
-                    novo_categoria = novo_categoria if novo_categoria else livro[4]
-
-                    if not novo_nome.isalpha():
-                        print("ERROR!O Nome do Livro deve conter apenas letras.")
-                    elif not novo_autor.isalpha():
-                        print("ERROR!O Nome do Autor deve conter apenas letras.")
-                    elif novo_ano != 4:
-                        print("ERROR! Ano Inválido. Digite no formato xxxx.")
-                    elif not novo_ano.isdigit():
-                        print("ERROR! O Ano deve conter apenas númereos.")
-                    elif novo_categoria.isalpha():
-                        print("ERROR! A categoria deve conter apenas letras.")
-                    else:
-                        conexao.cursor.execute(
-                            f"UPDDATE livros SET NomeLivro='{novo_nome}' , NomeAutor={novo_autor},AnoLivro={novo_ano},Categoria={novo_categoria} WHERE id={id}"
-                        )
-                        conexao.banco.commit()
-                        print("Livro Atualizado com sucesso!")
-                        break
-        except conexao.error as ex:
-            print(ex)
-        except ValueError:
-            print("Erro: ID Inválido.")
-
-    def deleta_livro(self, id):
-        try:
-            id = int(input("Informe o ID:"))
-            livro = self.ler_livro(id)
-
-            if livro and len(livro) > 0:
                 print("======================")
                 print("ID:", livro[0])
                 print("NOME DO LIVRO:", livro[1])
@@ -185,15 +135,94 @@ class CrudLivros:
                 print("ANO DE LANÇAMENTO:", livro[3])
                 print("CATEGORIA:", livro[4])
                 print("======================")
-            else:
-                print("Livro não encontrado")
-            perg = str(input(f"Deseja Deletar o cadastro do cliente (S/N):")).lower()
-            if perg == "s":
-                conexao.cursor.execute(f"DELETE FROM livros WHERE id={id}")
+
+                while True:
+                    print(
+                        "Digite os novos DADOS do livro (ou deixe em branco para manter o valor atual):"
+                    )
+                    novo_nome = input(f"Novo Nome do Livro ({livro[1]})")
+                    novo_autor = input(f"Novo Autor ({livro[2]})")
+                    novo_ano = input(f"Novo Ano de Lançamento ({livro[3]})")
+                    novo_categoria = input(f"Nova Categoria ({livro[4]})")
+
+                    novo_nome = novo_nome if novo_nome else livro[1]
+                    novo_autor = novo_autor if novo_autor else livro[2]
+                    novo_ano = novo_ano if novo_ano else livro[3]
+                    novo_categoria = novo_categoria if novo_categoria else livro[4]
+
+                    if not novo_nome.isspace() and re.match(
+                        nome_padrao, unidecode(novo_nome)
+                    ):
+                        if not novo_autor.isspace() and re.match(
+                            nome_padrao, unidecode(novo_autor)
+                        ):
+                            if len(novo_ano) == 4 and novo_ano.isdigit():
+                                if novo_categoria.isalpha():
+                                    break
+                                else:
+                                    print(
+                                        "ERROR! A categoria deve conter apenas letras."
+                                    )
+                            else:
+                                print("ERROR! Ano Inválido. Digite no formato xxxx.")
+                        else:
+                            print("ERROR! O Nome do Autor deve conter apenas letras.")
+                    else:
+                        print("ERROR! O Nome do Livro deve conter apenas letras.")
+
+                conexao.cursor.execute(
+                    f"UPDATE livros SET NomeLivro='{novo_nome}', NomeAutor='{novo_autor}', AnoLivro={novo_ano}, Categoria='{novo_categoria}' WHERE id={id}"
+                )
                 conexao.banco.commit()
-                print("Livro Deletado com Sucesso.")
+                print("Livro Atualizado com sucesso!")
             else:
-                pass
+                print("Livro não encontrado.")
+        except conexao.error as ex:
+            print("Erro de conexão com o banco de dados:", ex)
+        except ValueError:
+            print("Erro: ID Inválido.")
+
+    @staticmethod
+    def deleta_livro():
+        try:
+            while True:
+                id = int(input("Informe o ID:"))
+                conexao.cursor.execute(f"SELECT * FROM livros WHERE id={id}")
+                livro = conexao.cursor.fetchall()
+
+                if livro:
+                    for livro in livro:
+                        print("======================")
+                        print("ID:", livro[0])
+                        print("NOME DO LIVRO:", livro[1])
+                        print("AUTOR:", livro[2])
+                        print("ANO DE LANÇAMENTO:", livro[3])
+                        print("CATEGORIA:", livro[4])
+                        print("======================")
+                        break
+                    perg = str(
+                        input(f"Deseja Deletar o cadastro do cliente (S/N):")
+                    ).lower()
+                    if perg == "s":
+                        conexao.cursor.execute(f"DELETE FROM livros WHERE id={id}")
+                        conexao.banco.commit()
+                        print("Livro Deletado com Sucesso.")
+                    break
+                else:
+                    print("Livro não encontrado")
+                    print("Oque deseja fazer:")
+                    print("1. Tentar De Novo.")
+                    print("2. Ver Livros Cadastrados.")
+                    print("3. sair")
+                    perg = input("Oque deseja fazer:")
+                    if perg == "1":
+                        pass
+                    elif perg == "2":
+                        CrudLivros().ler_livros()
+                    elif perg == "3":
+                        break
+                    else:
+                        print("Opção inválida.")
 
         except ValueError:
             print("Erro: ID inválido.")
