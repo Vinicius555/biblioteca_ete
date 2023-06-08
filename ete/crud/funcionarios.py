@@ -145,9 +145,9 @@ class CrudFuncionario:
                 conexao.cursor.execute(
                     f"SELECT * FROM funcionarios WHERE Nome='{nome}'"
                 )
-                funcionarios = conexao.cursor.fetchall()
-                if funcionarios:
-                    for funcionario in funcionarios:
+                Funcionarios = conexao.cursor.fetchall()
+                if Funcionarios:
+                    for funcionario in Funcionarios:
                         print("Dados atuais do funcionário:")
                         print("ID:", funcionario[0])
                         print("Nome:", funcionario[1])
@@ -157,7 +157,6 @@ class CrudFuncionario:
                         print("UF:", funcionario[5])
                         print("========================")
 
-                    funcionario_atual = funcionario
                     break
                 else:
                     print("Funcionário não encontrado.")
@@ -170,25 +169,24 @@ class CrudFuncionario:
                     elif perg == "2":
                         CrudFuncionario().ler_funcionarios()
                     elif perg == "3":
-                        break
+                        return
                     else:
                         print("Opção inválida.")
-
             while True:
                 print(
                     "Digite os novos dados do funcionário (ou deixe em branco para manter o valor atual):"
                 )
-                novo_nome = input(f"Novo nome ({funcionario_atual[1]}): ")
-                novo_cpf = input(f"Novo CPF ({funcionario_atual[2]}): ")
-                novo_email = input(f"Novo email ({funcionario_atual[3]}): ")
-                novo_fone = input(f"Novo telefone ({funcionario_atual[4]}): ")
-                nova_uf = input(f"Nova UF ({funcionario_atual[5]}): ")
+                novo_nome = input(f"Novo nome ({funcionario[1]}): ")
+                novo_cpf = input(f"Novo CPF ({funcionario[2]}): ")
+                novo_email = input(f"Novo email ({funcionario[3]}): ")
+                novo_fone = input(f"Novo telefone ({funcionario[4]}): ")
+                nova_uf = input(f"Nova UF ({funcionario[5]}): ")
 
-                novo_nome = novo_nome if novo_nome else funcionario_atual[1]
-                novo_cpf = novo_cpf if novo_cpf else funcionario_atual[2]
-                novo_email = novo_email if novo_email else funcionario_atual[3]
-                novo_fone = novo_fone if novo_fone else funcionario_atual[4]
-                nova_uf = nova_uf if nova_uf else funcionario_atual[5]
+                novo_nome = novo_nome if novo_nome else funcionario[1]
+                novo_cpf = novo_cpf if novo_cpf else funcionario[2]
+                novo_email = novo_email if novo_email else funcionario[3]
+                novo_fone = novo_fone if novo_fone else funcionario[4]
+                nova_uf = nova_uf if nova_uf else funcionario[5]
 
                 if not novo_nome.isspace() and re.match(nome_padrao, novo_nome):
                     if not novo_cpf.isdigit() or len(novo_cpf) != 11:
@@ -271,13 +269,14 @@ class CrudFuncionario:
             print("4.  Alterar Funcionário.")
             print("5.  Deleta Funcionário")
             print("6.  Lista Cliente.")
-            print("7.  Procurar Cliente.")
-            print("8.  Deleta Cliente.")
-            print("9.  Cadastrar Livro.")
-            print("10. Alterar livro.")
-            print("11. Lista Livros.")
-            print("12. Procurar Livro.")
-            print("13. Deletar Livro")
+            print("7.  Alterar Cliente.")
+            print("8.  Procurar Cliente.")
+            print("9.  Deleta Cliente.")
+            print("10. Cadastrar Livro.")
+            print("11. Alterar livro.")
+            print("12. Lista Livros.")
+            print("13. Procurar Livro.")
+            print("14. Deletar Livro")
             print("0.  Sair")
             perg = input("Selecione a opção:")
             print("=============================")
@@ -296,18 +295,20 @@ class CrudFuncionario:
             elif perg == "6":
                 CrudClientes().ler_clientes()
             elif perg == "7":
-                CrudClientes().ler_cliente()
+                CrudClientes().atualizar_cliente()
             elif perg == "8":
-                CrudClientes().deleta_cliente()
+                CrudClientes().ler_cliente()
             elif perg == "9":
-                CrudLivros.criar_livros()
+                CrudClientes().deleta_cliente()
             elif perg == "10":
-                CrudLivros().atualizar_livro()
+                CrudLivros.criar_livros()
             elif perg == "11":
-                CrudLivros().ler_livros()
+                CrudLivros().atualizar_livro()
             elif perg == "12":
-                CrudLivros().ler_livro()
+                CrudLivros().ler_livros()
             elif perg == "13":
+                CrudLivros().ler_livro()
+            elif perg == "14":
                 CrudLivros.deleta_livro()
             elif perg == "0":
                 break

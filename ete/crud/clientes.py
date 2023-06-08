@@ -106,50 +106,59 @@ class CrudClientes:
     def atualizar_cliente():
         try:
             while True:
-                nome = str(input("Informe o Nome:"))
+                nome = input("Informe o Nome:")
                 conexao.cursor.execute(f"SELECT * FROM clientes WHERE Nome='{nome}'")
-                cliente = conexao.cursor.fetchone()
+                Clientes = conexao.cursor.fetchall()
+                if Clientes:
+                    for cliente in Clientes:
+                        print("Dados atuais do funcionário:")
+                        print("ID:", cliente[0])
+                        print("Nome:", cliente[1])
+                        print("CPF:", cliente[2])
+                        print("Fone:", cliente[3])
+                        print("========================")
 
-                if cliente:
-                    print("======================")
-                    print("ID:", cliente[0])
-                    print("NOME:", cliente[1])
-                    print("CPF:", cliente[2])
-                    print("FONE:", cliente[3])
-                    print("======================")
-                    print(
-                        "Digite os novos DADOS de cliente (ou deixe em branco para manter o valor atual):"
-                    )
-                    novo_nome = input(f"Novo Nome ({cliente[1]})")
-                    novo_cpf = input(f"Novo CPF ({cliente[2]})")
-                    novo_fone = input(f"Novo Telefone ({cliente[3]})")
-
-                    novo_nome = novo_nome if novo_nome else cliente[1]
-                    novo_cpf = novo_cpf if novo_cpf else cliente[2]
-                    novo_fone = novo_fone if novo_fone else cliente[3]
-
-                    if not novo_nome.isspace() and re.match(nome_padrao, novo_nome):
-                        if not novo_cpf.isdigit():
-                            print("ERROR! O CPF deve conter apenas números.")
-                        elif len(novo_cpf) != 11:
-                            print("ERROR! CPF Inválido.")
-                        elif not novo_fone.isdigit():
-                            print("ERROR! O Telefone deve conter apenas números.")
-                        elif len(novo_fone) != 11:
-                            print("ERROR! Telefone inválido.")
-                        else:
-                            conexao.cursor.execute(
-                                f"UPDATE clientes SET Nome='{novo_nome}', CPF='{novo_cpf}', Fone='{novo_fone}' WHERE Nome='{nome}'"
-                            )
-                            conexao.banco.commit()
-                            print("Cliente Atualizado com sucesso!")
-                            break
-                    else:
-                        print("ERROR! O nome deve conter apenas letras.")
+                    break
                 else:
                     print("Cliente não encontrado.")
-        except conexao.error as ex:
-            print("Erro de conexão com o banco de dados:", ex)
+                    print("1. Pesquisar de novo.")
+                    print("2. Verificar Clientes registrados.")
+                    print("3. Sair")
+                    perg = input("O que deseja fazer:")
+                    if perg == "1":
+                        pass
+                    elif perg == "2":
+                        CrudClientes().ler_clientes()
+                    elif perg == "3":
+                        return
+                    else:
+                        print("Opção inválida.")
+            while True:
+                print(
+                    "Digite os novos dados do Cliente (ou deixe em branco para manter o valor atual):"
+                )
+                novo_nome = input(f"Novo nome ({cliente[1]}): ")
+                novo_cpf = input(f"Novo CPF ({cliente[2]}): ")
+                novo_fone = input(f"Novo telefone ({cliente[3]}): ")
+
+                novo_nome = novo_nome if novo_nome else cliente[1]
+                novo_cpf = novo_cpf if novo_cpf else cliente[2]
+                novo_fone = novo_fone if novo_fone else cliente[3]
+
+                if not novo_nome.isspace() and re.match(nome_padrao, novo_nome):
+                    if not novo_cpf.isdigit() or len(novo_cpf) != 11:
+                        print("Erro: CPF inválido.")
+                    elif not novo_fone.isdigit() or len(novo_fone) != 11:
+                        print("Erro: Número de telefone inválido.")
+                    else:
+                        conexao.cursor.execute(
+                            f"UPDATE clientes SET nome='{novo_nome}', cpf={novo_cpf},fone={novo_fone}, WHERE Nome='{nome}'"
+                        )
+                        conexao.banco.commit()
+                        print("Cliente atualizado com sucesso!")
+                        break
+                else:
+                    print("Erro: Formato de nome inválido.")
         except ValueError:
             print("Erro: Nome inválido.")
 

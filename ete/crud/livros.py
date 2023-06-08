@@ -123,19 +123,35 @@ class CrudLivros:
     @staticmethod
     def atualizar_livro():
         try:
-            id = int(input("Informe o ID:"))
-            conexao.cursor.execute(f"SELECT * FROM livros WHERE id={id}")
-            livro = conexao.cursor.fetchone()
+            while True:
+                id = int(input("Informe o ID:"))
+                conexao.cursor.execute(f"SELECT * FROM livros WHERE id={id}")
+                Livro = conexao.cursor.fetchall()
 
-            if livro:
-                print("======================")
-                print("ID:", livro[0])
-                print("NOME DO LIVRO:", livro[1])
-                print("AUTOR:", livro[2])
-                print("ANO DE LANÇAMENTO:", livro[3])
-                print("CATEGORIA:", livro[4])
-                print("======================")
-
+                if Livro:
+                    for livro in Livro:
+                        print("======================")
+                        print("ID:", livro[0])
+                        print("NOME DO LIVRO:", livro[1])
+                        print("AUTOR:", livro[2])
+                        print("ANO DE LANÇAMENTO:", livro[3])
+                        print("CATEGORIA:", livro[4])
+                        print("======================")
+                    break
+                else:
+                    print("Livro não encontrado.")
+                    print("1. Pesquisar de novo.")
+                    print("2. Verificar Livros registrados.")
+                    print("3. Sair")
+                    perg = input("O que deseja fazer:")
+                    if perg == "1":
+                        pass
+                    elif perg == "2":
+                        CrudLivros().ler_livros()
+                    elif perg == "3":
+                        return
+                    else:
+                        print("Opção inválida.")
                 while True:
                     print(
                         "Digite os novos DADOS do livro (ou deixe em branco para manter o valor atual):"
