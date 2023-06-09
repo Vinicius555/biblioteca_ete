@@ -111,7 +111,8 @@ class CrudClientes:
                 Clientes = conexao.cursor.fetchall()
                 if Clientes:
                     for cliente in Clientes:
-                        print("Dados atuais do funcionário:")
+                        print("=======================")
+                        print("Dados atuais do Cliente:")
                         print("ID:", cliente[0])
                         print("Nome:", cliente[1])
                         print("CPF:", cliente[2])

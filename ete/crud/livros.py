@@ -124,13 +124,13 @@ class CrudLivros:
     def atualizar_livro():
         try:
             while True:
-                id = int(input("Informe o ID:"))
+                id = (input("Informe o ID:"))
                 conexao.cursor.execute(f"SELECT * FROM livros WHERE id={id}")
                 Livro = conexao.cursor.fetchall()
-
                 if Livro:
                     for livro in Livro:
                         print("======================")
+                        print("Dados atuais do livro:")
                         print("ID:", livro[0])
                         print("NOME DO LIVRO:", livro[1])
                         print("AUTOR:", livro[2])
@@ -152,47 +152,45 @@ class CrudLivros:
                         return
                     else:
                         print("Opção inválida.")
-                while True:
-                    print(
-                        "Digite os novos DADOS do livro (ou deixe em branco para manter o valor atual):"
-                    )
-                    novo_nome = input(f"Novo Nome do Livro ({livro[1]})")
-                    novo_autor = input(f"Novo Autor ({livro[2]})")
-                    novo_ano = input(f"Novo Ano de Lançamento ({livro[3]})")
-                    novo_categoria = input(f"Nova Categoria ({livro[4]})")
-
-                    novo_nome = novo_nome if novo_nome else livro[1]
-                    novo_autor = novo_autor if novo_autor else livro[2]
-                    novo_ano = novo_ano if novo_ano else livro[3]
-                    novo_categoria = novo_categoria if novo_categoria else livro[4]
-
-                    if not novo_nome.isspace() and re.match(
-                        nome_padrao, unidecode(novo_nome)
-                    ):
-                        if not novo_autor.isspace() and re.match(
-                            nome_padrao, unidecode(novo_autor)
-                        ):
-                            if len(novo_ano) == 4 and novo_ano.isdigit():
-                                if novo_categoria.isalpha():
-                                    break
-                                else:
-                                    print(
-                                        "ERROR! A categoria deve conter apenas letras."
-                                    )
-                            else:
-                                print("ERROR! Ano Inválido. Digite no formato xxxx.")
-                        else:
-                            print("ERROR! O Nome do Autor deve conter apenas letras.")
-                    else:
-                        print("ERROR! O Nome do Livro deve conter apenas letras.")
-
-                conexao.cursor.execute(
-                    f"UPDATE livros SET NomeLivro='{novo_nome}', NomeAutor='{novo_autor}', AnoLivro={novo_ano}, Categoria='{novo_categoria}' WHERE id={id}"
+            while True:
+                print(
+                    "Digite os novos DADOS do livro (ou deixe em branco para manter o valor atual):"
                 )
-                conexao.banco.commit()
-                print("Livro Atualizado com sucesso!")
-            else:
-                print("Livro não encontrado.")
+                novo_nome = input(f"Novo Nome do Livro ({livro[1]})")
+                novo_autor = input(f"Novo Autor ({livro[2]})")
+                novo_ano = input(f"Novo Ano de Lançamento ({livro[3]})")
+                novo_categoria = input(f"Nova Categoria ({livro[4]})")
+
+                novo_nome = novo_nome if novo_nome else livro[1]
+                novo_autor = novo_autor if novo_autor else livro[2]
+                novo_ano = novo_ano if novo_ano else livro[3]
+                novo_categoria = novo_categoria if novo_categoria else livro[4]   
+
+                if not novo_nome.isspace() and re.match(
+                    nome_padrao, unidecode(novo_nome)
+                ):
+                    if not novo_autor.isspace() and re.match(
+                        nome_padrao, unidecode(novo_autor)
+                    ):
+                        if len(novo_ano) == 4 and novo_ano.isdigit():
+                            if novo_categoria.isalpha():
+                                break
+                            else:
+                                print(
+                                    "ERROR! A categoria deve conter apenas letras."
+                                )
+                        else:
+                            print("ERROR! Ano Inválido. Digite no formato xxxx.")
+                    else:
+                        print("ERROR! O Nome do Autor deve conter apenas letras.")
+                else:
+                    print("ERROR! O Nome do Livro deve conter apenas letras.")
+
+            conexao.cursor.execute(
+                f"UPDATE livros SET NomeLivro='{novo_nome}', NomeAutor='{novo_autor}', AnoLivro={novo_ano}, Categoria='{novo_categoria}' WHERE id={id}"
+            )
+            conexao.banco.commit()
+            print("Livro Atualizado com sucesso!")   
         except conexao.error as ex:
             print("Erro de conexão com o banco de dados:", ex)
         except ValueError:

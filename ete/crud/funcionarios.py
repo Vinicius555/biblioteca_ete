@@ -148,14 +148,15 @@ class CrudFuncionario:
                 Funcionarios = conexao.cursor.fetchall()
                 if Funcionarios:
                     for funcionario in Funcionarios:
-                        print("Dados atuais do funcionário:")
-                        print("ID:", funcionario[0])
-                        print("Nome:", funcionario[1])
-                        print("CPF:", funcionario[2])
-                        print("Email:", funcionario[3])
-                        print("Fone:", funcionario[4])
-                        print("UF:", funcionario[5])
-                        print("========================")
+                        print("==============================")
+                        print("| Dados atuais do funcionário:")
+                        print("| ID:", funcionario[0])
+                        print("| Nome:", funcionario[1])
+                        print("| CPF:", funcionario[2])
+                        print("| Email:", funcionario[3])
+                        print("| Fone:", funcionario[4])
+                        print("| UF:", funcionario[5])
+                        print("===============================")
 
                     break
                 else:
