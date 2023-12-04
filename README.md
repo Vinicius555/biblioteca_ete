@@ -48,4 +48,4 @@ Contribuições são bem-vindas! Sinta-se à vontade para abrir issues ou pull r
 
 Trabalho feito para aula de linguagem de programção.
 
-Orientado pela a professora Mayana Duarte(`https://github.com/Mayanamda`)
+Orientado pela a professora Mayana Duarte(https://github.com/Mayanamda)
